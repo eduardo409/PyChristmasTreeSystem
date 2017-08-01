@@ -84,10 +84,12 @@ class MainPage(tk.Frame):
                           font=LARGE_FONT,image=self.tree_logo, compound="left",takefocus = False)
         label.grid(row=0, sticky="nesw")
 
-        # Buttons
-        inventory_button = ttk.Button(self, text="Inventory",takefocus = False,
+        # Butt
+
+        self.logo = tk.PhotoImage(file="images/2.png" ).subsample(2, 2)
+        inventory_button = ttk.Button(self, text="Inventory",takefocus = False,image=self.logo,compound='right',
                              command=lambda: controller.show_frame(InventoryMainPage))
-        inventory_button.grid(pady=25)
+        inventory_button.grid(pady = 20,padx=400, sticky = "nesw")
 
         employee_button = ttk.Button(self, text="Employee",takefocus = False,
                             command=lambda: controller.show_frame(EmployeePage))
