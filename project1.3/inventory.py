@@ -79,7 +79,7 @@ class MainPage(tk.Frame):
         self.grid_columnconfigure(0, weight=1)
 
         # header tree image
-        self.tree_logo = tk.PhotoImage(file= "images\\1.png").subsample(4,4)
+        self.tree_logo = tk.PhotoImage(file= "images/1.png").subsample(4,4)
         label = ttk.Label(self, text="Welcome To Alpine Christmas Trees ", background = "#2a2a2a", foreground="white",
                           font=LARGE_FONT,image=self.tree_logo, compound="left",takefocus = False)
         label.grid(row=0, sticky="nesw")
@@ -91,12 +91,14 @@ class MainPage(tk.Frame):
                              command=lambda: controller.show_frame(InventoryMainPage))
         inventory_button.grid(pady = 20,padx=400, sticky = "nesw")
 
-        employee_button = ttk.Button(self, text="Employee",takefocus = False,
+        self.logo2 = tk.PhotoImage(file="images/3.png").subsample(2, 2)
+        employee_button = ttk.Button(self, text="Employee",takefocus = False,image=self.logo2,compound='right',
                             command=lambda: controller.show_frame(EmployeePage))
-        employee_button.grid(pady = 25)
+        employee_button.grid(pady = 20,padx=400, sticky = "nesw")
 
-        inventory_button = ttk.Button(self, text="Report",takefocus = False,)
-        inventory_button.grid(pady=25)
+        self.logo3 = tk.PhotoImage(file="images/4.png").subsample(2, 2)
+        inventory_button = ttk.Button(self, text="Report",takefocus = False,image=self.logo3,compound='right',)
+        inventory_button.grid(pady = 20,padx=400, sticky = "nesw")
 
 
 
