@@ -1,3 +1,5 @@
+""" Brandon, Eduardo, Sergio (sam13c) """
+
 import tkinter as tk
 import re, time, hashlib
 from datetime import datetime
@@ -37,7 +39,7 @@ class System(tk.Tk):
         self.stock = []
 
         self.currentUser = Employee()
-        self.passwordLabel = ttk.Label()
+        self.password_label = ttk.Label()
 
         self.u = pickle.Unpickler(self.file)
         while True:
@@ -192,7 +194,8 @@ class Employee(object):
 
         id = self.firstName + self.lastName + str(self.phoneNumber)
         hash_object = hashlib.md5(id.encode())
-        self.id = str(hash_object.hexdigest())[:19]
+        
+        self.id = str(hash_object.hexdigest())[:6]
 
 
 
@@ -212,16 +215,24 @@ class EmployeePage(tk.Frame):
         self.entry_number = ttk.Entry(self, width=40)
         self.entry_number.grid(column=0, row=2, pady=20)
 
+        self.status_label = ttk.Label()
+
         self.clockInOut_btn = ttk.Button(self, text='Clock In/Out', takefocus=False,
-                                         command=lambda: self.displayStatus(controller.currentUser.firstName,
+                                         command=lambda: self.displayStatus(controller,
+                                                                            controller.currentUser.firstName,
                                                                             controller.currentUser.lastName,
-                                                                            controller.currentUser.loggedIn))
+                                                                            controller.currentUser.loggedIn,
+                                                                            controller.currentUser.id,
+                                                                            self.entry_number.get()))
 
         self.clockInOut_btn.grid(column=0, row=3, pady=20, padx=400, sticky='nesw')
 
-        self.employee_status = self.displayStatus(controller.currentUser.firstName,
+        self.employee_status = self.displayStatus(controller,
+                                                  controller.currentUser.firstName,
                                                   controller.currentUser.lastName,
-                                                  controller.currentUser.loggedIn)
+                                                  controller.currentUser.loggedIn,
+                                                  controller.currentUser.id,
+                                                  self.entry_number.get())
 
         self.status_label = ttk.Label(self, text=self.employee_status, font=SMALL_FONT, width=10)
         self.status_label.grid(column=0, row=4, pady=20, padx=340, sticky='nesw')
@@ -239,16 +250,25 @@ class EmployeePage(tk.Frame):
 
 
 
-    def displayStatus(self, firstName, lastName, clockedIn):
-        if clockedIn:
-            return str(firstName) + str(lastName) + ' Clocked in at ' + str(datetime.now())
-        elif not clockedIn:
-            return str(firstName) + str(lastName) + ' Clocked out at ' + str(datetime.now())
-        else:
-            return 'EmployeeId not registered or Incorrect ID'
+    def displayStatus(self, controller, firstName, lastName, clockedIn, realID, userID):
+        status = " "
+        if realID == userID and clockedIn:
+            status = str(firstName) + ' ' + str(lastName) + ' Clocked in at ' + str(datetime.now())
+            controller.currentUser.loggedIn = False
 
-        if not clockedIn:
-            controller.passwordLabel = ' '
+        elif realID == userID and not clockedIn:
+            status = str(firstName) + ' ' + str(lastName) + ' Clocked out at ' + str(datetime.now())
+            controller.currentUser.loggedIn = True
+
+        elif firstName is 'N/A' and lastName is 'N/A':
+            status = ' '
+        else:
+            status = 'EmployeeId not registered or Incorrect ID'
+
+        self.status_label = ttk.Label(self, text=status, font=SMALL_FONT, width=10)
+        self.status_label.grid(column=0, row=4, pady=20, padx=340, sticky='nesw')
+
+        return status
 
 
 
@@ -298,8 +318,8 @@ class EmployeeRegisterPage(tk.Frame):
                                           self.phoneNumber_entry.get())
 
         controller.currentUser.loggedIn = True
-        controller.passwordLabel = ttk.Label(self, text=controller.currentUser.id, font=SMALL_FONT)
-        controller.passwordLabel.grid(column=0, row=9, pady=15)
+        controller.password_label = ttk.Label(self, text=controller.currentUser.id, font=SMALL_FONT)
+        controller.password_label.grid(column=0, row=9, pady=15)
 
 
 
