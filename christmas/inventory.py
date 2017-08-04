@@ -48,7 +48,6 @@ class System(tk.Tk):
             except EOFError:
                 break
         self.file.close()
-        print(self.stock)
         self.container = tk.Frame(self)
         self.container.pack(side="top", fill="both", expand=True)
         self.container.grid_rowconfigure(0, weight=1)
@@ -96,6 +95,7 @@ class System(tk.Tk):
             entry.delete(0, len(data))
             data = data.split(" ")
             tree = Tree(data)
+            tree.sold = False
             self.stock.append(tree)
             self.file = open("files/data.p", 'wb')
             self.p = pickle.Pickler(self.file, 3)
@@ -103,23 +103,19 @@ class System(tk.Tk):
             self.file.close()
         entry.delete(0, 100)
         sizes = self.getSizes()
-        for size in sizes:
-            print(str(size) + ":", self.getAmount(size, "pre"))
+        self.show_frame(InventoryAddPage)
 
-
-
-
+        
     def removeInventory(self, entry):
         data = entry.get()
         data = data.split(" ")
         if len(data) == 3:
-            print("Remove")
             data = entry.get()
             entry.delete(0, len(data))
             data = data.split(" ")
             for i in range(0, (len(self.stock))):
-                print(self.stock[i].size, self.stock[i].worth, self.stock[i].id)
-                if self.stock[i].size == str(data[0]) and self.stock[i].worth == str(data[1]) and self.stock[i].id == str(data[2]):
+                if self.stock[i].size == str(data[0]) and self.stock[i].worth == str(data[1]) and self.stock[
+                    i].id == str(data[2]):
                     self.stock[i].sold = True
                     self.stock[i].date_sold = time.strftime("%d/%m/%Y")
                     self.file = open("files/data.p", 'wb')
@@ -128,9 +124,7 @@ class System(tk.Tk):
                     self.file.close()
         entry.delete(0, 100)
         sizes = self.getSizes()
-        for size in sizes:
-            print(str(size) + ":", self.getAmount(size, "pre"))
-
+        self.show_frame(InventoryRemovePage)
 
 
 
@@ -374,16 +368,14 @@ class Report(tk.Frame):
             #for loop will calculate the amount of different grades there are per current size.
             #each outer loop iteration if go as follows: 3-4,4-5,5-6,6-7,7-8,ect......
             for treeobj in controller.stock:
-                print(treeobj.size + " " + val + " " + str(treeobj.sold))
                 if treeobj.size == val and treeobj.sold == False:
-                    print("*****************")
                     if treeobj.worth == "pre":
                         precount = precount + 1
                     if treeobj.worth == "one":
                         onecount = onecount + 1
                     if treeobj.worth == "two":
                         twocount = twocount + 1
-            print()
+
             if s1 != 12:
                 tree.insert('','end',text=tex, value=(precount,onecount,twocount))
             else:
@@ -430,38 +422,38 @@ class InventoryMainPage(tk.Frame):
         backbutton.pack(pady=60, side="left", padx=20)
 
 
-
-
 class InventoryAddPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         # self.focus_set()
         self.grid_columnconfigure(0, weight=1)
         self.tree_logo = tk.PhotoImage(file="images/2.png").subsample(1, 1)
-        self.inventory_label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False, 
-                                            font=LARGE_FONT, image=self.tree_logo, compound="left")
-        self.inventory_label.grid(row=0, sticky="nesw")
+        label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False,
+                          font=LARGE_FONT, image=self.tree_logo, compound="left")
+        label.grid(row=0, sticky = "nw")
+        for size in controller.getSizes():
+            if controller.getAmount(size,"pre") > 0:
+                name = "label" + str(size)
+                name = tk.Label(self,text = "Size " +size + ":\n" +str(controller.getAmount(size,"pre")),font = LARGE_FONT,takefocus = False,background = "red", justify = "center" ).grid(row = 0, column = size, padx = 10)
 
         # label/entry/add_button inside frame1
-        self.add_page_frame = tk.Frame(self, takefocus=False)
-        self.add_page_frame.grid()
-        
-        self.entry_label = ttk.Label(self.add_page_frame, text="Entry", font=LARGE_FONT, takefocus=False)
-        self.entry_label.grid(sticky="w")
-        
-        self.entry = ttk.Entry(self.add_page_frame, font=LARGE_FONT, takefocus=True)
+        self.frame1 = tk.Frame(self, takefocus=False)
+        self.frame1.grid(columnspan = 100)
+        eLabel = ttk.Label(self.frame1, text="Entry", font=LARGE_FONT, takefocus=False)
+        eLabel.grid(sticky="w")
+        self.entry = ttk.Entry(self.frame1, font=LARGE_FONT, takefocus=True)
         self.entry.grid()
         # make sure to just pass self and acces the varibles with the dot operator
-        self.add_btn = ttk.Button(self.add_page_frame, text="ADD +", takefocus=False,
+        self.add_button = ttk.Button(self.frame1, text="ADD +", takefocus=False,
                                      command=lambda: controller.addInventory(self.entry, ))
-        self.add_btn.grid(pady=10)
+        self.add_button.grid(pady=10)
         self.entry.bind("<Return>", self.enter_key_pressed)
         # backbutton
+        self.logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
 
-        self.back_btn_logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
-        self.back_btn = ttk.Button(self, text="Back", image=self.back_btn_logo, cursor="hand2", compound="top", takefocus=False,
-                                    command=lambda: controller.show_frame(InventoryMainPage))
-        self.back_btn.grid(sticky="w", padx=20, pady=250)
+        backbutton = ttk.Button(self, text="Back", image=self.logo, cursor="hand2", compound="top", takefocus=False,
+                                command=lambda: controller.show_frame(InventoryMainPage))
+        backbutton.grid(sticky="w", padx=20, pady=250)
         self.entry.focus()
         #
         # button2 = ttk.Button(self, text="Page One",
@@ -470,9 +462,7 @@ class InventoryAddPage(tk.Frame):
 
     def enter_key_pressed(self, *args):
         self.add_button.invoke()
-        print("Add item")
-
-
+        # print("Add item")
 
 
 class InventoryRemovePage(tk.Frame):
@@ -480,41 +470,44 @@ class InventoryRemovePage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.focus_set()
         self.grid_columnconfigure(0, weight=1)
-        
         self.tree_logo = tk.PhotoImage(file="images/7.png").subsample(1, 1)
-        self.inventory_label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False, 
-                                            font=LARGE_FONT, image=self.tree_logo, compound="left")
-        self.inventory_label.grid(row=0, sticky="nesw")
-
-        # amountLabel = tk.Label(self,text = "Amount:\n",font = LARGE_FONT,takefocus = False,background = "red", justify = "center" )
-        # amountLabel.grid(row =0, sticky = "ne", padx = 200,pady = 50)
+        label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False,
+                          font=LARGE_FONT, image=self.tree_logo, compound="left")
+        label.grid(row=0, sticky="nw")
+        for size in controller.getSizes():
+            print(size)
+            if controller.getAmount(size, "pre") > 0:
+                name = "label" + str(size)
+                name = tk.Label(self, text="Size " + size + ":\n" + str(controller.getAmount(size, "pre")), font=LARGE_FONT,
+                            takefocus=False, background="red", justify="center").grid(row=0, column=size, padx=10)
 
         # label/entry/add_button inside frame1
-        self.remove_page_frame = tk.Frame(self)
+        self.frame1 = tk.Frame(self)
 
-        self.entry_label = ttk.Label(self.remove_page_frame, text="Entry", font=LARGE_FONT, takefocus=False)
-        self.entry_label.grid(sticky="w")
-        
-        self.entry = ttk.Entry(self.remove_page_frame, font=LARGE_FONT, takefocus=True)
-        self.entry.grid()
+        eLabel = ttk.Label(self.frame1, text="Entry", font=LARGE_FONT, takefocus=False)
+        eLabel.grid(sticky="w")
+        self.entry2 = ttk.Entry(self.frame1, font=LARGE_FONT, takefocus=True)
 
-        self.remove_btn = ttk.Button(self.remove_page_frame, text="REMOVE -", takefocus=False,
-                                        command=lambda: controller.removeInventory(self.entry))
-        self.remove_btn.grid(pady=10)
-        self.entry.bind("<Return>", self.enter_key_pressed)
-        self.remove_page_frame.grid()
-        
+        self.entry2.grid()
+        self.remove_button = ttk.Button(self.frame1, text="REMOVE -", takefocus=False,
+                                        command=lambda: controller.removeInventory(self.entry2))
+        self.remove_button.grid(pady=10)
+        self.entry2.bind("<Return>", self.enter_key_pressed)
+        self.frame1.grid(columnspan = 100)
         # backbutton
-        self.back_btn_logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
-        self.back_btn = ttk.Button(self, text="Back", image=self.back_btn_logo, cursor="hand2", compound="top",
-                                     takefocus=False, command=lambda: controller.show_frame(InventoryMainPage))
-        self.back_btn.grid(sticky="w", padx=20, pady=250)
-        # self.entry2.focus_set()
-
-
+        self.logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
+        self.backbutton = ttk.Button(self, text="Back", image=self.logo, cursor="hand2", compound="top",
+                                     takefocus=False,
+                                     command=lambda: controller.show_frame(InventoryMainPage))
+        self.backbutton.grid(sticky="w", padx=20, pady=250)
+        self.entry2.focus()
+    
 
     def enter_key_pressed(self, event):
         self.remove_button.invoke()
+
+
+
 
 
 app = System()
