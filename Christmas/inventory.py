@@ -475,7 +475,6 @@ class InventoryRemovePage(tk.Frame):
                           font=LARGE_FONT, image=self.tree_logo, compound="left")
         label.grid(row=0, sticky="nw")
         for size in controller.getSizes():
-            print(size)
             if controller.getAmount(size, "pre") > 0:
                 name = "label" + str(size)
                 name = tk.Label(self, text="Size " + size + ":\n" + str(controller.getAmount(size, "pre")), font=LARGE_FONT,
