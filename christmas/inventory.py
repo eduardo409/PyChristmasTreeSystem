@@ -8,6 +8,7 @@ try:
 except:
     import pickle
 
+
 LARGE_FONT = ("Verdana", 24)
 MEDIUM_FONT = ("Verdana",18)
 SMALL_FONT = ("Verdana", 12)
@@ -21,6 +22,7 @@ class Tree(object):
             self.id = str(data[2])
             self.sold = False
             self.date_sold = "00/00/0000"
+
 
 
 class System(tk.Tk):
@@ -59,11 +61,15 @@ class System(tk.Tk):
 
         self.show_frame(MainPage)
 
+
+
     def show_frame(self, cont):
         frame = cont(self.container,self)
         frame.grid(row=0, column=0, sticky="nsew")
         frame.focus_set()
         frame.tkraise()
+
+
 
     def findValue(self, size, id):
         list = []
@@ -76,6 +82,8 @@ class System(tk.Tk):
                 return True
 
         return False
+
+
 
     def addInventory(self, entry):
         data = entry.get()
@@ -95,6 +103,9 @@ class System(tk.Tk):
         sizes = self.getSizes()
         for size in sizes:
             print(str(size) + ":", self.getAmount(size, "pre"))
+
+
+
 
     def removeInventory(self, entry):
         data = entry.get()
@@ -118,12 +129,18 @@ class System(tk.Tk):
         for size in sizes:
             print(str(size) + ":", self.getAmount(size, "pre"))
 
+
+
+
     def getSizes(self):
         sizes = []
         for value in self.stock:
             if value.size not in sizes:
                 sizes.append(value.size)
         return sizes
+
+
+
 
     def getAmount(self, size, worth):
         counter = 0
@@ -134,35 +151,36 @@ class System(tk.Tk):
         return counter
 
 
+
 class MainPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         # When using grid, any extra space in the parent(self)is allocated
-        #  proportionate to the "weight" of a row and/or a column
+        # proportionate to the "weight" of a row and/or a column
         self.grid_columnconfigure(0, weight=1)
 
-        # header tree image
         self.tree_logo = tk.PhotoImage(file="images/1.png").subsample(4, 4)
-        label = ttk.Label(self, text="Welcome To Alpine Christmas Trees ", background="#2a2a2a", foreground="white",
-                          font=LARGE_FONT, image=self.tree_logo, compound="left", takefocus=False)
-        label.grid(row=0, sticky="nesw")
+        self.logo_label = ttk.Label(self, text="Welcome To Alpine Christmas Trees ", background="#2a2a2a", foreground="white",
+                                    font=LARGE_FONT, image=self.tree_logo, compound="left", takefocus=False)
+        self.logo_label.grid(row=0, sticky="nesw")
 
-        # Butt
 
-        self.logo = tk.PhotoImage(file="images/2.png").subsample(2, 2)
-        inventory_button = ttk.Button(self, text="Inventory", takefocus=False, image=self.logo, compound='right',
-                                      command=lambda: controller.show_frame(InventoryMainPage))
-        inventory_button.grid(pady=20, padx=400, sticky="nesw")
+        self.inventory_logo = tk.PhotoImage(file="images/2.png").subsample(2, 2)
+        self.inventory_btn = ttk.Button(self, text="Inventory", takefocus=False, image=self.inventory_logo, compound='right',
+                                        command=lambda: controller.show_frame(InventoryMainPage))
+        self.inventory_btn.grid(pady=20, padx=400, sticky="nesw")
 
-        self.logo2 = tk.PhotoImage(file="images/3.png").subsample(2, 2)
-        employee_button = ttk.Button(self, text="Employee", takefocus=False, image=self.logo2, compound='right',
-                                     command=lambda: controller.show_frame(EmployeePage))
-        employee_button.grid(pady=20, padx=400, sticky="nesw")
+        self.employee_logo = tk.PhotoImage(file="images/3.png").subsample(2, 2)
+        self.employee_btn = ttk.Button(self, text="Employee", takefocus=False, image=self.employee_logo, compound='right',
+                                        command=lambda: controller.show_frame(EmployeePage))
+        self.employee_btn.grid(pady=20, padx=400, sticky="nesw")
 
-        self.logo3 = tk.PhotoImage(file="images/4.png").subsample(2, 2)
-        inventory_button = ttk.Button(self, text="Report", takefocus=False, image=self.logo3, compound='right',
-                                      command=lambda: controller.show_frame(Report))
-        inventory_button.grid(pady=20, padx=400, sticky="nesw")
+
+        self.report_logo = tk.PhotoImage(file="images/4.png").subsample(2, 2)
+        self.report_btn = ttk.Button(self, text="Report", takefocus=False, image=self.report_logo, compound='right',
+                                        command=lambda: controller.show_frame(Report))
+        self.report_btn.grid(pady=20, padx=400, sticky="nesw")
+
 
 
 class Employee(object):
@@ -174,7 +192,8 @@ class Employee(object):
 
         id = self.firstName + self.lastName + str(self.phoneNumber)
         hash_object = hashlib.md5(id.encode())
-        self.id = str(hash_object.hexdigest())
+        self.id = str(hash_object.hexdigest())[:19]
+
 
 
 class EmployeePage(tk.Frame):
@@ -218,6 +237,8 @@ class EmployeePage(tk.Frame):
 
         self.back_btn.grid(column=0, row=7, sticky='w', pady=40, padx=40)
 
+
+
     def displayStatus(self, firstName, lastName, clockedIn):
         if clockedIn:
             return str(firstName) + str(lastName) + ' Clocked in at ' + str(datetime.now())
@@ -228,6 +249,7 @@ class EmployeePage(tk.Frame):
 
         if not clockedIn:
             controller.passwordLabel = ' '
+
 
 
 class EmployeeRegisterPage(tk.Frame):
@@ -268,6 +290,8 @@ class EmployeeRegisterPage(tk.Frame):
 
         self.back_btn.grid(sticky='w', pady=40, padx=40)
 
+
+
     def register_user(self, controller):
         controller.currentUser = Employee(self.firstName_entry.get(),
                                           self.lastName_entry.get(),
@@ -276,20 +300,23 @@ class EmployeeRegisterPage(tk.Frame):
         controller.currentUser.loggedIn = True
         controller.passwordLabel = ttk.Label(self, text=controller.currentUser.id, font=SMALL_FONT)
         controller.passwordLabel.grid(column=0, row=9, pady=15)
+
+
+
 class Report(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
 
-        #LABEL BELOW
         self.grid_columnconfigure(0, weight=1)
+        
         self.report_logo = tk.PhotoImage(file= "images/4.png").subsample(4,4)
-        label = ttk.Label(self, text="Welcome To Alpine Christmas Trees ", background = "#2a2a2a", foreground="white",
-                          font=LARGE_FONT,image=self.report_logo, compound="left",takefocus = False)
-        label.grid(row=0, sticky="nesw")
+        self.logo_label = ttk.Label(self, text="Welcome To Alpine Christmas Trees ", background = "#2a2a2a", foreground="white",
+                                    font=LARGE_FONT,image=self.report_logo, compound="left",takefocus = False)
+        self.logo_label.grid(row=0, sticky="nesw")
 
-        labelname = ttk.Label(self, text="Inventory to start", foreground="black",
-                          font=MEDIUM_FONT,takefocus = False)
-        labelname.grid(pady=28)
+        self.inventory_label = ttk.Label(self, text="Inventory to start", foreground="black",
+                                            font=MEDIUM_FONT,takefocus = False)
+        self.inventory_label.grid(pady=28)
 
         tree = ttk.Treeview(self)
         #ysb = ttk.Scrollbar(self, orient='vertical',command=tree.yview)
@@ -351,18 +378,21 @@ class Report(tk.Frame):
         #tree.configure(yscrollcommand=treeScroll.set)
 
         # RETURN BUTTON
-        self.logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
-        backbutton =  ttk.Button(self, text="Back", image = self.logo,cursor = "hand2",compound = "top",takefocus = False,
-                    command=lambda: controller.show_frame(MainPage))
-        backbutton.grid(sticky = "w", padx = 20, pady = 250)
+        self.back_btn_logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
+        self.back_btn =  ttk.Button(self, text="Back", image = self.back_btn_logo,cursor = "hand2",compound = "top",takefocus = False,
+                                    command=lambda: controller.show_frame(MainPage))
+        self.back_btn.grid(sticky = "w", padx = 20, pady = 250)
+
+
+
 
 class InventoryMainPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.logo4 = tk.PhotoImage(file="images/6.png").subsample(3, 3)
-        label = ttk.Label(self, text="Inventory Main", font=LARGE_FONT, takefocus=False, background="gray",
-                          image=self.logo4, compound="left")
-        label.pack(fill="both")
+        self.inventory_logo = tk.PhotoImage(file="images/6.png").subsample(3, 3)
+        self.inventory_label = ttk.Label(self, text="Inventory Main", font=LARGE_FONT, takefocus=False, background="gray",
+                                            image=self.inventory_logo, compound="left")
+        self.inventory_label.pack(fill="both")
 
         self.logo = tk.PhotoImage(file="images/10.png").subsample(12, 12)
         button1 = ttk.Button(self, text="Scan Item", takefocus=False, image=self.logo, compound="right",
@@ -380,34 +410,38 @@ class InventoryMainPage(tk.Frame):
         backbutton.pack(pady=60, side="left", padx=20)
 
 
+
+
 class InventoryAddPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         # self.focus_set()
         self.grid_columnconfigure(0, weight=1)
         self.tree_logo = tk.PhotoImage(file="images/2.png").subsample(1, 1)
-        label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False,
-                          font=LARGE_FONT, image=self.tree_logo, compound="left")
-        label.grid(row=0, sticky="nesw")
+        self.inventory_label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False, 
+                                            font=LARGE_FONT, image=self.tree_logo, compound="left")
+        self.inventory_label.grid(row=0, sticky="nesw")
 
         # label/entry/add_button inside frame1
-        self.frame1 = tk.Frame(self, takefocus=False)
-        self.frame1.grid()
-        eLabel = ttk.Label(self.frame1, text="Entry", font=LARGE_FONT, takefocus=False)
-        eLabel.grid(sticky="w")
-        self.entry = ttk.Entry(self.frame1, font=LARGE_FONT, takefocus=True)
+        self.add_page_frame = tk.Frame(self, takefocus=False)
+        self.add_page_frame.grid()
+        
+        self.entry_label = ttk.Label(self.add_page_frame, text="Entry", font=LARGE_FONT, takefocus=False)
+        self.entry_label.grid(sticky="w")
+        
+        self.entry = ttk.Entry(self.add_page_frame, font=LARGE_FONT, takefocus=True)
         self.entry.grid()
         # make sure to just pass self and acces the varibles with the dot operator
-        self.add_button = ttk.Button(self.frame1, text="ADD +", takefocus=False,
+        self.add_btn = ttk.Button(self.add_page_frame, text="ADD +", takefocus=False,
                                      command=lambda: controller.addInventory(self.entry, ))
-        self.add_button.grid(pady=10)
+        self.add_btn.grid(pady=10)
         self.entry.bind("<Return>", self.enter_key_pressed)
         # backbutton
-        self.logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
 
-        backbutton = ttk.Button(self, text="Back", image=self.logo, cursor="hand2", compound="top", takefocus=False,
-                                command=lambda: controller.show_frame(InventoryMainPage))
-        backbutton.grid(sticky="w", padx=20, pady=250)
+        self.back_btn_logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
+        self.back_btn = ttk.Button(self, text="Back", image=self.back_btn_logo, cursor="hand2", compound="top", takefocus=False,
+                                    command=lambda: controller.show_frame(InventoryMainPage))
+        self.back_btn.grid(sticky="w", padx=20, pady=250)
         self.entry.focus()
         #
         # button2 = ttk.Button(self, text="Page One",
@@ -419,44 +453,49 @@ class InventoryAddPage(tk.Frame):
         print("Add item")
 
 
+
+
 class InventoryRemovePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.focus_set()
         self.grid_columnconfigure(0, weight=1)
+        
         self.tree_logo = tk.PhotoImage(file="images/7.png").subsample(1, 1)
-        label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False,
-                          font=LARGE_FONT, image=self.tree_logo, compound="left")
-        label.grid(row=0, sticky="nesw")
+        self.inventory_label = ttk.Label(self, text="Inventory", foreground="green", takefocus=False, 
+                                            font=LARGE_FONT, image=self.tree_logo, compound="left")
+        self.inventory_label.grid(row=0, sticky="nesw")
+
         # amountLabel = tk.Label(self,text = "Amount:\n",font = LARGE_FONT,takefocus = False,background = "red", justify = "center" )
         # amountLabel.grid(row =0, sticky = "ne", padx = 200,pady = 50)
 
         # label/entry/add_button inside frame1
-        self.frame1 = tk.Frame(self)
+        self.remove_page_frame = tk.Frame(self)
 
-        eLabel = ttk.Label(self.frame1, text="Entry", font=LARGE_FONT, takefocus=False)
-        eLabel.grid(sticky="w")
-        self.entry2 = ttk.Entry(self.frame1, font=LARGE_FONT, takefocus=True)
+        self.entry_label = ttk.Label(self.remove_page_frame, text="Entry", font=LARGE_FONT, takefocus=False)
+        self.entry_label.grid(sticky="w")
+        
+        self.entry = ttk.Entry(self.remove_page_frame, font=LARGE_FONT, takefocus=True)
+        self.entry.grid()
 
-        self.entry2.grid()
-        self.remove_button = ttk.Button(self.frame1, text="REMOVE -", takefocus=False,
-                                        command=lambda: controller.removeInventory(self.entry2))
-        self.remove_button.grid(pady=10)
-        self.entry2.bind("<Return>", self.enter_key_pressed)
-        self.frame1.grid()
+        self.remove_btn = ttk.Button(self.remove_page_frame, text="REMOVE -", takefocus=False,
+                                        command=lambda: controller.removeInventory(self.entry))
+        self.remove_btn.grid(pady=10)
+        self.entry.bind("<Return>", self.enter_key_pressed)
+        self.remove_page_frame.grid()
+        
         # backbutton
-        self.logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
-        self.backbutton = ttk.Button(self, text="Back", image=self.logo, cursor="hand2", compound="top",
-                                     takefocus=False,
-                                     command=lambda: controller.show_frame(InventoryMainPage))
-        self.backbutton.grid(sticky="w", padx=20, pady=250)
-
+        self.back_btn_logo = tk.PhotoImage(file="images/5.png").subsample(5, 5)
+        self.back_btn = ttk.Button(self, text="Back", image=self.back_btn_logo, cursor="hand2", compound="top",
+                                     takefocus=False, command=lambda: controller.show_frame(InventoryMainPage))
+        self.back_btn.grid(sticky="w", padx=20, pady=250)
         # self.entry2.focus_set()
+
+
 
     def enter_key_pressed(self, event):
         self.remove_button.invoke()
 
 
 app = System()
-
 app.mainloop()
